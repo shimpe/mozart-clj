@@ -1,4 +1,4 @@
-(ns examples.mozart-game
+(ns mozart.game
   (:use
     [overtone.at-at :only [now at mk-pool]]
     [overtone.midi :only [midi-out midi-note-on midi-note-off]]
