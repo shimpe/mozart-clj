@@ -1,7 +1,8 @@
 (ns mozart.game
-  (:use
-    [overtone.at-at :only [now at mk-pool]]
-    [overtone.midi :only [midi-out midi-note]]
+  (:require
+    [overtone.midi] 
+    [overtone.at-at :as at-at]
+    [overtone.studio.midi :as studio.midi]
     [overtone.music.pitch :as pitch]))
 
 ;;
@@ -1594,11 +1595,11 @@
 
 (def BAR-KINDS 11)
 
-(def at-pool (mk-pool))
+(def at-pool (at-at/mk-pool))
 
 (defn notes-on-off [sink notes vel dur]
   (doseq [n notes]
-    (midi-note sink (pitch/note n) vel dur)))
+    (studio.midi/midi-note sink (pitch/note n) vel dur)))
 
 (defn play-chords [out bar]
   (loop [chords bar
@@ -1606,7 +1607,7 @@
     (when chords
       (let [[notes r] (first chords)
             duration (* PPQN (rhythm r))]
-        (at (+ (now) offset)
+        (at-at/at (+ (at-at/now) offset)
             #(notes-on-off out notes VEL duration) at-pool)
         (recur (next chords) (+ offset duration))))))
 
@@ -1619,4 +1620,4 @@
 (defn mozart-game [out]
   (play-chords out (mozart-score)))
 
-(def ms-synth (midi-out "GS"))
+(def ms-synth (overtone.midi/midi-out "GS"))
