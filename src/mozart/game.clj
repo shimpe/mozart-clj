@@ -1608,7 +1608,7 @@
       (let [[notes r] (first chords)
             duration (* PPQN (rhythm r))]
         (at-at/at (+ (at-at/now) offset)
-            #(notes-on-off out notes VEL duration) at-pool)
+                  #(notes-on-off out notes VEL duration) at-pool)
         (recur (next chords) (+ offset duration))))))
 
 (defn random-bars [count bars]
