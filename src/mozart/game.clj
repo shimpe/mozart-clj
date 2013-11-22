@@ -18,6 +18,14 @@
 ;; and http://explodingart.com/jmusic/jmtutorial/MozartDiceGame.html
 ;;
 
+(def VEL 100)
+
+(def PPQN 480)
+
+(def ALLOW-GAP 0.9)
+
+(def BAR-KINDS 11)
+
 (def RHYTHMS
   { :QT 1/3
    :Q 1/2
@@ -26,8 +34,6 @@
    :DC 3/2
    :M 2
    :SB 4})
-
-(defn rhythm [k] (k RHYTHMS))
 
 (def bar1
   [
@@ -1587,28 +1593,21 @@
    [7 9] bar78
    [7 10] bar131})
 
-(def VEL 100)
-
-(def PPQN 480)
-
-(def ALLOW-GAP 0.9)
-
-(def BAR-KINDS 11)
-
 (def at-pool (at-at/mk-pool))
 
 (defn notes-on-off [sink notes vel dur]
   (doseq [n notes]
     (studio.midi/midi-note sink (pitch/note n) vel dur)))
 
+(defn ppqn [n] (* PPQN n))
+
 (defn play-chords [out bar]
   (loop [chords bar
          offset 0]
     (when chords
       (let [[notes r] (first chords)
-            duration (* PPQN (rhythm r))]
-        (at-at/at (+ (at-at/now) offset)
-                  #(notes-on-off out notes VEL duration) at-pool)
+            duration (-> r RHYTHMS ppqn)]
+        (at-at/after offset #(notes-on-off out notes VEL duration) at-pool)
         (recur (next chords) (+ offset duration))))))
 
 (defn random-bars [count bars]
